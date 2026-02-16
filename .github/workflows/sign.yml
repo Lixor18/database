@@ -1,0 +1,24 @@
+name: Repack IPA
+on: [workflow_dispatch] # Запуск вручну
+
+jobs:
+  repack:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract and Repack
+        run: |
+          mkdir temp_payload
+          unzip Telegram_UNSIGNED.ipa -d temp_payload
+          cd temp_payload
+          # Видаляємо старі підписи, якщо вони є
+          rm -rf Payload/*.app/_CodeSignature
+          zip -r ../Telegram_FIXED.ipa Payload
+          
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fixed-Telegram-IPA
+          path: Telegram_FIXED.ipa
